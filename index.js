@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const puppeteer = require('puppeteer')
@@ -26,7 +27,17 @@ if(process.env.AWS_LAMBDA_FUNCTION_VERSION){
 
 let result =[];
 const run = async()=>{
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+        args:[
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--single-process',
+            '--no-zygote'
+        ],
+        executablePath: process.env.NODE_ENV ==='production' 
+        ? process.env.PUPETEER_EXECUTABLE_PATH 
+        : puppeteer.executablePath()
+    });
     const page = await browser.newPage();
     await page.goto('https://www.futuretools.io/', { waitUntil: 'domcontentloaded', timeout: 5000 });
 
