@@ -1,63 +1,41 @@
 require('dotenv').config()
+const { executablePath, defaultViewport } = require('chrome-aws-lambda');
 const express = require('express')
 const app = express()
-const puppeteer = require('puppeteer')
 
-/*
+let chrome = {};
+let puppeteer;
+
 if(process.env.AWS_LAMBDA_FUNCTION_VERSION){
-    const chromium = require('chrome-aws-lambda')
-    const puppeteer = require('puppeteer-core')
-} else{
-    const puppeteer = require('puppeteer')
+    chrome = require('chrome-aws-lambda')
+    puppeteer = require('puppeteer-chrome')
+}else{
+    puppeteer = require('puppeteer')
 }
 
-
-    let options = {};
+let result =[];
+let options = {};
 
 if(process.env.AWS_LAMBDA_FUNCTION_VERSION){
     options = {
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath,
+        args:[...chrome.args, "--hide-scrollbars", "--disable-web-security"],
+        defaultViewport: chrome.defaultViewport,
+        executablePath: await chrome.executablePath,
         headless: true,
         ignoreHTTPSErrors: true
     }
 }
-*/
 
-let result =[];
 const run = async()=>{
-    const browser = await puppeteer.launch({
-        args:[
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--single-process',
-            '--no-zygote'
-        ],
-        executablePath: process.env.NODE_ENV ==='production' 
-        ? process.env.PUPPETEER_EXECUTABLE_PATH || 'google-chrome-stable'
-        : puppeteer.executablePath()
-    });
+    const browser = await puppeteer.launch(options);
     const page = await browser.newPage();
-    await page.goto('https://www.futuretools.io/', { waitUntil: 'domcontentloaded', timeout: 5000 });
+    await page.goto('https://www.futuretools.io/', 
+    { waitUntil: 'domcontentloaded', timeout: 5000 });
 
     const title = await page.title();
 
     result.push(title);
 
-    // const products = await page.$$('.w-dyn-items .w-row');
-    // console.log(products)
-
-    // for (const item of products){
-    //     const name = await page.evaluate(element => element.querySelector('.tool-item-link---new').textContent, item)
-
-    //     const link = await page.evaluate(element => element.querySelector('.tool-item-new-window---new').getAttribute('href'), item)
-     
-
-    //     result.push({name, link})
-
-    // }
-    // console.log(result)
 }
 
 app.get('/api/title',async(req,res)=>{
@@ -77,8 +55,7 @@ app.get('/',async(req,res)=>{
     
     } catch (error) {
         console.log(error)
-    }
-    
+    } 
 })
 
 app.listen(process.env.PORT || 3000, ()=>{
