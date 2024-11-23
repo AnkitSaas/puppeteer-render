@@ -71,6 +71,16 @@ app.get('/api/title',async(req,res)=>{
     
 })
 
+app.get('/',async(req,res)=>{
+    try {
+    res.send("The server is running on Production...")
+    
+    } catch (error) {
+        console.log(error)
+    }
+    
+})
+
 app.listen(process.env.PORT || 3000, ()=>{
     console.log('The server is listening on 3000...')
 })
