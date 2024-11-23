@@ -35,7 +35,7 @@ const run = async()=>{
             '--no-zygote'
         ],
         executablePath: process.env.NODE_ENV ==='production' 
-        ? process.env.PUPETEER_EXECUTABLE_PATH 
+        ? process.env.PUPPETEER_EXECUTABLE_PATH 
         : puppeteer.executablePath()
     });
     const page = await browser.newPage();
