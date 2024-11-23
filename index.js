@@ -35,7 +35,7 @@ const run = async()=>{
             '--no-zygote'
         ],
         executablePath: process.env.NODE_ENV ==='production' 
-        ? process.env.PUPPETEER_EXECUTABLE_PATH 
+        ? '/usr/bin/google-chrome'
         : puppeteer.executablePath()
     });
     const page = await browser.newPage();
